@@ -54,8 +54,8 @@ const animateNavigation = () => {
           isAnimating = true;
           gsap.to(navGlobal, {
             y: -navHeight,
-            duration: 0.9,
-            ease: 'power4.out',
+            duration: 1,
+            ease: 'power4.in',
             onComplete: () => {
               isAnimating = false;
             }
@@ -66,7 +66,7 @@ const animateNavigation = () => {
           isAnimating = true;
           gsap.to(navGlobal, {
             y: 0,
-            duration: 0.9,
+            duration: 1,
             ease: 'power4.out',
             onComplete: () => {
               isAnimating = false;
