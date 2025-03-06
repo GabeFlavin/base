@@ -15,7 +15,7 @@ Navigation hide show animation when scrolled up and down
 */
 const animateNavigation = () => {
     const navGlobal = document.querySelector('.nav-global');
-    const navHeight = navGlobal.offsetHeight + 100;
+    const navHeight = navGlobal.offsetHeight + 10;
     let lastScrollTop = 0;
     let isAnimating = false;
   
@@ -39,8 +39,8 @@ const animateNavigation = () => {
         if (scrollTop < navHeight) {
           gsap.to(navGlobal, {
             y: 0,
-            duration: 0.5,
-            ease: 'power2.out'
+            duration: 1.2,
+            ease: 'power4.out'
           });
           lastScrollTop = scrollTop;
           return;
@@ -54,24 +54,20 @@ const animateNavigation = () => {
           isAnimating = true;
           gsap.to(navGlobal, {
             y: -navHeight,
-            duration: 0.3,
-            ease: 'power2.out',
+            duration: 0.9,
+            ease: 'power4.out',
             onComplete: () => {
               isAnimating = false;
             }
           });
   
-          gsap.set(".nav-drop", {
-            zIndex: 10,
-            display: 'none',
-          });
         } else {
           // Scrolling Up - Show Nav
           isAnimating = true;
           gsap.to(navGlobal, {
             y: 0,
-            duration: 0.3,
-            ease: 'power2.out',
+            duration: 0.9,
+            ease: 'power4.out',
             onComplete: () => {
               isAnimating = false;
             }
