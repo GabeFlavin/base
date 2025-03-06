@@ -18,6 +18,8 @@ const animateNavigation = () => {
     const navHeight = navGlobal.offsetHeight + 10;
     let lastScrollTop = 0;
     let isAnimating = false;
+    const scrollThreshold = 10; // Minimum scroll distance to trigger animation
+    let lastTime = 0;
   
     // Initial state - ensure nav is visible at the start
     gsap.set(navGlobal, {
@@ -32,8 +34,8 @@ const animateNavigation = () => {
     ScrollTrigger.create({
       start: 'top top',
       end: 'bottom bottom',
-      onUpdate: (self) => {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      onUpdate: () => {
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
   
         // Don't trigger if we're at the very top of the page
         if (scrollTop < navHeight) {
@@ -47,9 +49,11 @@ const animateNavigation = () => {
         }
   
         // Prevent multiple animations from running simultaneously
-        if (isAnimating) return;
-  
-        if (scrollTop > lastScrollTop) {
+        const currentTime = Date.now();
+        if (scrollTop > lastScrollTop && Math.abs(scrollTop - lastScrollTop) > scrollThreshold && currentTime - lastTime > 100) {
+          // Scrolling Down - Hide Nav
+          lastTime = currentTime;
+          isAnimating = true;
           // Scrolling Down - Hide Nav
           isAnimating = true;
           gsap.to(navGlobal, {
