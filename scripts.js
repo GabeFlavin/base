@@ -7,6 +7,7 @@ console.log('scripts.js loaded successfully v1.0.0');
 
 
 
+
 Navigation hide show animation when scrolled up and down
 
 
@@ -35,7 +36,7 @@ const animateNavigation = () => {
       start: 'top top',
       end: 'bottom bottom',
       onUpdate: () => {
-        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
   
         // Don't trigger if we're at the very top of the page
         if (scrollTop < navHeight) {
