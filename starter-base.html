@@ -1,0 +1,145 @@
+/*
+
+
+
+IN HEAD TAG
+
+
+
+*/
+
+<style>
+    html.lenis {
+      height: auto;
+    }
+    .lenis.lenis-smooth {
+      scroll-behavior: auto;
+    }
+    .lenis.lenis-smooth [data-lenis-prevent] {
+      overscroll-behavior: contain;
+    }
+    .lenis.lenis-stopped {
+      overflow: hidden;
+    }
+    /* Hide all content initially */
+    html {
+    visibility: hidden;
+    }
+
+    /* But make the curtain visible */
+    #loading-curtain {
+    visibility: visible;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #040006;
+    z-index: 9999;
+    transition: height 1.5s cubic-bezier(0.950, 0.050, 0.795, 0.035);
+    z-transition: opacity .3s cubic-bezier(0.950, 0.050, 0.795, 0.035);
+    }
+
+    /* Prevent scrolling while curtain is visible */
+    body.loading {
+    overflow: hidden;
+    }
+    
+</style>
+
+<script>
+(function() {
+    // Create and insert the loading curtain as early as possible
+    function createCurtain() {
+      // Add loading class to html element
+      document.documentElement.classList.add('loading-active');
+      
+      // Create curtain element
+      const curtain = document.createElement('div');
+      curtain.id = 'loading-curtain';
+      
+      // Insert it as the first child in the body (or create body if needed)
+      if (!document.body) {
+        document.addEventListener('DOMContentLoaded', function() {
+          document.body.insertBefore(curtain, document.body.firstChild);
+        });
+      } else {
+        document.body.insertBefore(curtain, document.body.firstChild);
+      }
+    }
+    
+    // Function to reveal the page content and animate the curtain away
+    function revealPage() {
+      // Make all content visible
+      document.documentElement.style.visibility = 'visible';
+      
+      // Small delay before starting curtain animation
+      setTimeout(function() {
+        const curtain = document.getElementById('loading-curtain');
+        if (curtain) {
+          curtain.style.height = '0';
+          //curtain.style.opacity = '0';
+          
+          // Re-enable scrolling
+          document.documentElement.classList.remove('loading-active');
+          
+          // Remove curtain after transition completes
+          curtain.addEventListener('transitionend', function() {
+            if (curtain.parentNode) {
+              curtain.parentNode.removeChild(curtain);
+            }
+          });
+        }
+      }, 200);
+    }
+    
+    // Create the curtain immediately
+    createCurtain();
+    
+    // Set up page reveal when everything is loaded
+    if (document.readyState === 'complete') {
+      revealPage();
+    } else {
+      window.addEventListener('load', revealPage);
+    }
+  })();
+</script>
+
+
+
+
+/*
+
+
+
+AFTER BODY TAG
+
+
+
+*/
+
+<!-- GSAP -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollToPlugin.min.js"></script>
+
+<!--script src="https://unpkg.com/split-type"></script-->
+
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script> 
+
+<script>
+
+const lenis = new Lenis()
+
+lenis.on('scroll', (e) => {
+  //console.log(e)
+})
+
+lenis.on('scroll', ScrollTrigger.update)
+
+gsap.ticker.add((time)=>{
+  lenis.raf(time * 1000)
+})
+
+gsap.ticker.lagSmoothing(0)
+</script>

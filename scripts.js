@@ -1,6 +1,8 @@
 gsap.registerPlugin(ScrollTrigger);
 //gsap.registerPlugin(Draggable);
 
+console.log('scripts.js loaded');
+
 /*
 
 
