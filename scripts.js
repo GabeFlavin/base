@@ -21,68 +21,89 @@ const animateNavigation = () => {
     let isAnimating = false;
     const scrollThreshold = 10; // Minimum scroll distance to trigger animation
     let lastTime = 0;
-  
+
     // Initial state - ensure nav is visible at the start
     gsap.set(navGlobal, {
-      y: 0,
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      zIndex: 900
+        y: 0,
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        zIndex: 900,
+        backgroundColor: 'rgba(255, 255, 255, 0)' // Initial transparent background
     });
-  
-    ScrollTrigger.create({
-      start: 'top top',
-      end: 'bottom bottom',
-      onUpdate: () => {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-  
-        // Don't trigger if we're at the very top of the page
-        if (scrollTop < navHeight) {
-          gsap.to(navGlobal, {
-            y: 0,
-            duration: 1.2,
-            ease: 'power4.out'
-          });
-          lastScrollTop = scrollTop;
-          return;
-        }
-  
-        // Prevent multiple animations from running simultaneously
+
+    // Initialize Lenis smooth scrolling
+    const lenis = new Lenis({
+        lerp: 0.1, // Adjust the smoothness (optional)
+        smoothWheel: true, // Enable smooth scrolling for mouse wheel
+    });
+
+    // Use Lenis's onScroll event instead of the native scroll event
+    lenis.on('scroll', ({ scroll }) => {
+        const scrollTop = scroll;
         const currentTime = Date.now();
-        if (scrollTop > lastScrollTop && Math.abs(scrollTop - lastScrollTop) > scrollThreshold && currentTime - lastTime > 100) {
-          // Scrolling Down - Hide Nav
-          lastTime = currentTime;
-          isAnimating = true;
-          // Scrolling Down - Hide Nav
-          isAnimating = true;
-          gsap.to(navGlobal, {
-            y: -navHeight,
-            duration: 1,
-            ease: 'power4.in',
-            onComplete: () => {
-              isAnimating = false;
-            }
-          });
-  
+
+        // Prevent multiple animations from running simultaneously
+        if (isAnimating || currentTime - lastTime < 100) return;
+
+        // Add/remove background color based on scroll position
+        if (scrollTop > navHeight) {
+            // Animate background color to semi-transparent white
+            gsap.to(navGlobal, {
+                backgroundColor: 'rgba(255, 255, 255, 0.9)', // Semi-transparent white
+                duration: 0.3, // Adjust the duration for smoother transitions
+                ease: 'power2.out'
+            });
         } else {
-          // Scrolling Up - Show Nav
-          isAnimating = true;
-          gsap.to(navGlobal, {
-            y: 0,
-            duration: 1,
-            ease: 'power4.out',
-            onComplete: () => {
-              isAnimating = false;
-            }
-          });
+            // Animate background color back to fully transparent
+            gsap.to(navGlobal, {
+                backgroundColor: 'rgba(255, 255, 255, 0)', // Fully transparent
+                duration: 0.3, // Adjust the duration for smoother transitions
+                ease: 'power2.out'
+            });
         }
-  
-        lastScrollTop = scrollTop;
-      }
+
+        // Determine scroll direction
+        if (Math.abs(scrollTop - lastScrollTop) > scrollThreshold) {
+            if (scrollTop > lastScrollTop) {
+                // Scrolling Down - Hide Nav
+                if (scrollTop > navHeight) { // Only hide if scrolled past the nav height
+                    isAnimating = true;
+                    gsap.to(navGlobal, {
+                        y: -navHeight,
+                        duration: 1,
+                        ease: 'power4.in',
+                        onComplete: () => {
+                            isAnimating = false;
+                        }
+                    });
+                }
+            } else {
+                // Scrolling Up - Show Nav
+                isAnimating = true;
+                gsap.to(navGlobal, {
+                    y: 0,
+                    duration: 1,
+                    ease: 'power4.out',
+                    onComplete: () => {
+                        isAnimating = false;
+                    }
+                });
+            }
+
+            lastTime = currentTime;
+            lastScrollTop = scrollTop;
+        }
     });
-  };
-  
-  // Initialize the navigation animation
-  animateNavigation();
+
+    // RAF loop for Lenis
+    const raf = (time) => {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+    };
+    requestAnimationFrame(raf);
+};
+
+// Initialize the navigation animation
+animateNavigation();
